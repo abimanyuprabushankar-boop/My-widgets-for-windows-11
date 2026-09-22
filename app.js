@@ -417,7 +417,104 @@ softLuminaDynamicStyles.textContent = `
     }
 
 
-    /* =====================================================
+        /* =====================================================
+       WEATHER
+       ===================================================== */
+
+    .weather-widget {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        gap: 8px;
+    }
+
+    .weather-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .weather-location { font-size: 10px; opacity: 0.55; margin-bottom: 2px; }
+    .weather-condition { font-size: 12px; font-weight: 600; }
+
+    .weather-main {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .weather-icon { font-size: 31px; line-height: 1; }
+
+    .weather-temperature {
+        font-size: 29px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -1px;
+    }
+
+    .weather-feels { margin-top: 3px; font-size: 9px; opacity: 0.5; }
+
+    .weather-refresh {
+        width: 28px;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(127,127,127,0.08);
+        color: inherit;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .weather-refresh:hover { background: rgba(127,127,127,0.15); }
+
+    .weather-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .weather-detail {
+        padding: 7px 8px;
+        border-radius: 9px;
+        background: rgba(127,127,127,0.07);
+        min-width: 0;
+    }
+
+    .weather-detail-label {
+        display: block;
+        font-size: 8px;
+        opacity: 0.5;
+        margin-bottom: 2px;
+    }
+
+    .weather-detail-value { font-size: 10px; font-weight: 600; }
+
+    .weather-forecast {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        margin-top: auto;
+    }
+
+    .weather-day {
+        padding: 7px 5px;
+        border-radius: 9px;
+        background: rgba(127,127,127,0.06);
+        text-align: center;
+    }
+
+    .weather-day-name { font-size: 8px; opacity: 0.5; margin-bottom: 3px; }
+    .weather-day-icon { font-size: 17px; line-height: 1.1; }
+    .weather-day-temp { margin-top: 3px; font-size: 9px; font-weight: 600; }
+    .weather-updated { font-size: 8px; opacity: 0.4; text-align: right; }
+
+/* =====================================================
        CALENDAR
        ===================================================== */
 
@@ -3179,35 +3276,75 @@ function getWidgetContent(
         case "weather":
 
             return `
-                <div>
+                <div class="weather-widget" data-weather-widget>
 
-                    <div class="weather-temperature">
-                        16°C
+                    <div class="weather-top">
+                        <div>
+                            <div class="weather-location">Stockholm</div>
+                            <div class="weather-condition">Partly cloudy</div>
+                        </div>
+
+                        <button
+                            class="weather-refresh"
+                            data-weather-refresh
+                            type="button"
+                            aria-label="Refresh weather"
+                            title="Refresh weather"
+                        >↻</button>
                     </div>
 
-                    <div class="weather-status">
-                        🌤️ Partly cloudy
+                    <div class="weather-main">
+                        <div class="weather-icon">🌤️</div>
+
+                        <div>
+                            <div class="weather-temperature">16°C</div>
+                            <div class="weather-feels">Feels like 15°C</div>
+                        </div>
                     </div>
 
-                    <div class="weather-details">
-                        Stockholm
+                    <div class="weather-details-grid">
+
+                        <div class="weather-detail">
+                            <span class="weather-detail-label">Humidity</span>
+                            <span class="weather-detail-value">68%</span>
+                        </div>
+
+                        <div class="weather-detail">
+                            <span class="weather-detail-label">Wind</span>
+                            <span class="weather-detail-value">9 km/h</span>
+                        </div>
+
                     </div>
 
-                    <div class="weather-details">
-                        Humidity 68% · Wind 9 km/h
+                    <div class="weather-forecast">
+
+                        <div class="weather-day">
+                            <div class="weather-day-name">Today</div>
+                            <div class="weather-day-icon">🌤️</div>
+                            <div class="weather-day-temp">18° / 11°</div>
+                        </div>
+
+                        <div class="weather-day">
+                            <div class="weather-day-name">Tomorrow</div>
+                            <div class="weather-day-icon">☀️</div>
+                            <div class="weather-day-temp">20° / 12°</div>
+                        </div>
+
+                        <div class="weather-day">
+                            <div class="weather-day-name">Wed</div>
+                            <div class="weather-day-icon">🌦️</div>
+                            <div class="weather-day-temp">17° / 10°</div>
+                        </div>
+
                     </div>
 
-                    <div class="weather-details">
-                        <br>
-                        Today: 🌤️ 18° / 11°
-                        <br>
-                        Tomorrow: ☀️ 20° / 12°
-                        <br>
-                        Wed: 🌦️ 17° / 10°
+                    <div class="weather-updated" data-weather-updated>
+                        Updated just now
                     </div>
 
                 </div>
             `;
+
 
 
         case "calendar":
@@ -6770,6 +6907,51 @@ resetButton.addEventListener(
 loadNotes();
 
 loadTasks();
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const button =
+            event.target.closest(
+                "[data-weather-refresh]"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const widget =
+            button.closest(
+                "[data-weather-widget]"
+            );
+
+        if (!widget) {
+            return;
+        }
+
+        const updated =
+            widget.querySelector(
+                "[data-weather-updated]"
+            );
+
+        if (updated) {
+            updated.textContent =
+                "Updated just now";
+        }
+
+        button.animate(
+            [
+                { transform: "rotate(0deg)" },
+                { transform: "rotate(180deg)" }
+            ],
+            {
+                duration: 250,
+                easing: "ease-out"
+            }
+        );
+    }
+);
 
 renderGroups();
 
